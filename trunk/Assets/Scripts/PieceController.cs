@@ -80,6 +80,7 @@ public class PieceController : MonoBehaviour {
                 GameControllerScript.lastPiece = GameControllerScript.actualPiece;
                 if (GameControllerScript.lastPiece != null && GameControllerScript.lastPiece.piece != null)
                 {
+                    GameControllerScript.ClearPossibleDestinations();
                     GameControllerScript.lastPiece.piece.particleSystem.SetActive(false);
                 }
                 GameControllerScript.actualPiece = ChessboardControllerScript.Board[pirsza - 1, drugo - 1];
