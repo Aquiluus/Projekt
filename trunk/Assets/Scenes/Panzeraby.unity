@@ -741,6 +741,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!114 &214922188
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -946,7 +947,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cff65ef6ca9111439a7a6d1290c85fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lastPiece1: {fileID: 0}
+  actualPiece1: {fileID: 0}
+  toPlane1: {fileID: 0}
   gameCamera: {fileID: 772711208}
+  whiteWins: {fileID: 1160174628}
+  blackWins: {fileID: 858133541}
+  forceAttack: 0
+  turnAlligiance: 1
 --- !u!4 &329501337
 Transform:
   m_ObjectHideFlags: 0
@@ -1186,6 +1194,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!65 &351275935
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1397,6 +1406,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!114 &390501465
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1686,8 +1696,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 441711930}
-  m_LocalRotation: {x: .726568103, y: .186194167, z: .386683375, w: .536569297}
-  m_LocalPosition: {x: 209.819733, y: 522.649353, z: -328.442474}
+  m_LocalRotation: {x: .822711945, y: -.0714030191, z: .0238805376, w: .563450515}
+  m_LocalPosition: {x: 217.879288, y: 527.399475, z: -303.515106}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -2167,6 +2177,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!114 &503239315
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2542,6 +2553,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!114 &513077883
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3451,6 +3463,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!65 &747400359
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3611,6 +3624,7 @@ GameObject:
   - 92: {fileID: 772711207}
   - 124: {fileID: 772711206}
   - 81: {fileID: 772711205}
+  - 95: {fileID: 772711210}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -3657,7 +3671,7 @@ Camera:
     height: 1
   near clip plane: .300000012
   far clip plane: 1000
-  field of view: 100
+  field of view: 75
   orthographic: 0
   orthographic size: 6
   m_Depth: -1
@@ -3678,11 +3692,26 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 772711204}
   m_LocalRotation: {x: .270598084, y: -.65328151, z: .270598084, w: .65328151}
-  m_LocalPosition: {x: 215, y: 535, z: -327.566986}
+  m_LocalPosition: {x: 213.5, y: 535, z: -327.25}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 1038522550}
   m_Father: {fileID: 0}
   m_RootOrder: 3
+--- !u!95 &772711210
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 772711204}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: f9c47b19026615e499c9f43a3e0fdf46, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 1
+  m_HasTransformHierarchy: 1
 --- !u!1001 &772845970
 Prefab:
   m_ObjectHideFlags: 0
@@ -3961,6 +3990,76 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!1 &858133541
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 858133542}
+  - 33: {fileID: 858133545}
+  - 64: {fileID: 858133544}
+  - 23: {fileID: 858133543}
+  m_Layer: 0
+  m_Name: blackWins
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &858133542
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 858133541}
+  m_LocalRotation: {x: -.270593673, y: -.653253198, z: .270601124, w: -.653310359}
+  m_LocalPosition: {x: 3.78376889, y: 3.38281322, z: .507202446}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1038522550}
+  m_RootOrder: 0
+--- !u!23 &858133543
+Renderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 858133541}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_LightmapIndex: 255
+  m_LightmapTilingOffset: {x: 1, y: 1, z: 0, w: 0}
+  m_Materials:
+  - {fileID: 2100000, guid: 2d373b3ca8814d245bafd24e1a0c6039, type: 2}
+  m_SubsetIndices: 
+  m_StaticBatchRoot: {fileID: 0}
+  m_UseLightProbes: 0
+  m_LightProbeAnchor: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+--- !u!64 &858133544
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 858133541}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_SmoothSphereCollisions: 0
+  m_Convex: 0
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!33 &858133545
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 858133541}
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &875584206
 GameObject:
   m_ObjectHideFlags: 0
@@ -4426,6 +4525,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!65 &917977109
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4518,6 +4618,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!114 &918224894
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4893,6 +4994,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!114 &945754667
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5075,6 +5177,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!65 &951328361
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5492,6 +5595,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!65 &1022033426
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5600,6 +5704,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!114 &1027322028
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5658,6 +5763,35 @@ MeshFilter:
   m_PrefabInternal: {fileID: 1441032074}
   m_GameObject: {fileID: 1027322023}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1038522549
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1038522550}
+  m_Layer: 0
+  m_Name: Win
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1038522550
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1038522549}
+  m_LocalRotation: {x: -.270598084, y: .65328151, z: -.270598084, w: .65328151}
+  m_LocalPosition: {x: -1.20349061, y: .327724218, z: 8.75197983}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 858133542}
+  - {fileID: 1160174632}
+  m_Father: {fileID: 772711209}
+  m_RootOrder: 0
 --- !u!1 &1085438848
 GameObject:
   m_ObjectHideFlags: 0
@@ -5856,6 +5990,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!114 &1092416422
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6141,6 +6276,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!65 &1110888457
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6646,6 +6782,76 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!1 &1160174628
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1160174632}
+  - 33: {fileID: 1160174631}
+  - 64: {fileID: 1160174630}
+  - 23: {fileID: 1160174629}
+  m_Layer: 0
+  m_Name: whiteWins
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!23 &1160174629
+Renderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1160174628}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_LightmapIndex: 255
+  m_LightmapTilingOffset: {x: 1, y: 1, z: 0, w: 0}
+  m_Materials:
+  - {fileID: 2100000, guid: ed08c53917107ad4d9e9e95e39ae80c6, type: 2}
+  m_SubsetIndices: 
+  m_StaticBatchRoot: {fileID: 0}
+  m_UseLightProbes: 0
+  m_LightProbeAnchor: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+--- !u!64 &1160174630
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1160174628}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_SmoothSphereCollisions: 0
+  m_Convex: 0
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!33 &1160174631
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1160174628}
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &1160174632
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1160174628}
+  m_LocalRotation: {x: -.270593673, y: -.653253198, z: .270601124, w: -.653310359}
+  m_LocalPosition: {x: 3.78376889, y: 3.38281322, z: .507202446}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1038522550}
+  m_RootOrder: 1
 --- !u!1 &1195042336
 GameObject:
   m_ObjectHideFlags: 0
@@ -6812,6 +7018,14 @@ Prefab:
       propertyPath: gameCamera
       value: 
       objectReference: {fileID: 772711208}
+    - target: {fileID: 11400000, guid: 021092cf4d2039f429bcfdbb76c2572f, type: 2}
+      propertyPath: whiteWins
+      value: 
+      objectReference: {fileID: 1160174628}
+    - target: {fileID: 11400000, guid: 021092cf4d2039f429bcfdbb76c2572f, type: 2}
+      propertyPath: blackWins
+      value: 
+      objectReference: {fileID: 858133541}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 021092cf4d2039f429bcfdbb76c2572f, type: 2}
   m_RootGameObject: {fileID: 329501335}
@@ -7044,6 +7258,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!65 &1228741873
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7466,6 +7681,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!65 &1294891322
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7677,6 +7893,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!114 &1360325144
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7814,6 +8031,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!114 &1393777870
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8225,6 +8443,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!114 &1467899716
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8748,6 +8967,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!65 &1483353954
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9673,6 +9893,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!114 &1741597302
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10564,6 +10785,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!114 &1986195536
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11193,6 +11415,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!114 &2039591669
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11314,6 +11537,7 @@ MonoBehaviour:
   IsKing: 0
   OcupiedPlane: {fileID: 0}
   particleSystem: {fileID: 0}
+  currentGameObject: {fileID: 0}
 --- !u!114 &2063426250
 MonoBehaviour:
   m_ObjectHideFlags: 0
