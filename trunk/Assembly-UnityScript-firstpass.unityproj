@@ -39,10 +39,10 @@
 	<Reference Include="System.Core" />
 	<Reference Include="System.Xml.Linq" />
 	<Reference Include="UnityEngine">
-	  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
+	  <HintPath>E:/UNITY/Editor/Data/Managed/UnityEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="UnityEditor">
-	  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
+	  <HintPath>E:/UNITY/Editor/Data/Managed/UnityEditor.dll</HintPath>
 	</Reference>
   </ItemGroup>
   <ItemGroup>
@@ -52,7 +52,7 @@
      <Compile Include="Assets\Plugins\FT_FreeSample\Script\StopCAM.js" />
      <Compile Include="Assets\Plugins\FT_FreeSample\Script\VisibleBG.js" />
  <Reference Include="TouchScript">
- <HintPath>C:/Users/Aquiluus/Projekt/trunk/Assets/TouchScript/Plugins/TouchScript.dll</HintPath>
+ <HintPath>I:/STUDIA/GK/projekt/Projekt/trunk/Assets/TouchScript/Plugins/TouchScript.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
