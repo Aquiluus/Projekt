@@ -45,8 +45,7 @@ public class GameController : MonoBehaviour {
 		to = null;
 		possibleDestinations = new ChessboardPlane[4];
 		cameraAnimator = gameCamera.GetComponent<Animator> ();
-
-
+		possibleDestinations = new ChessboardPlane[4];
 	}
 
 
@@ -56,11 +55,17 @@ public class GameController : MonoBehaviour {
 		PreTurnSetting();
        
     }
+	IEnumerator WaitFor1Sec(){
+
+		 yield return new WaitForSeconds(1);
+	}
+
 
 	
 	// Update is called once per frame
-	void Update () 
+	void FixedUpdate () 
 	{
+		bool attacked= false;
 
         //PreTurnSetting();
 
@@ -74,16 +79,25 @@ public class GameController : MonoBehaviour {
 
 			if (to != null && to.particleSystem.activeInHierarchy == true && actualPiece.piece.Allegiance == turnAlligiance)
 			{
-				//TODO: movement Animation
+
 				int checkX =actualPiece.X-to.X;
 				if( Mathf.Abs(checkX) > 1)
 				{
+					PieceController tempPiece;
 					Debug.Log("bicie!");
-					if ( DestroyPiece())
-					actualPiece.piece.transform.position = to.plane.transform.position;
+					attacked = true;
+					if ( DestroyPiece())		// TODO: Destroy Animation
+					actualPiece.piece.transform.position = to.plane.transform.position; // TODO: movement animation
 
-					ClearPossibleDestinations();
-					if (actualPiece.piece != null&& actualPiece.piece.Allegiance == turnAlligiance)
+					tempPiece = actualPiece.piece;
+					WaitFor1Sec();
+
+					actualPiece = to;
+					actualPiece.piece = tempPiece;
+
+					WaitFor1Sec();
+
+					if (actualPiece.piece != null && actualPiece.piece.Allegiance == turnAlligiance)
 					{
 						Debug.Log("po biciu");
 						ClearPossibleDestinations();
@@ -112,25 +126,32 @@ public class GameController : MonoBehaviour {
 										Debug.Log("nie bedzie forceattack na "+ destination.plane.gameObject.name);
 										forceAttack=false;
 										to= null;
+										actualPiece = null;
 									}
 
 							}
 
-						} 
+						}else{
+							forceAttack=false;
+							to= null;
+							actualPiece = null;
+						}
 					}
 
 				
 			}
-				if (to!=null)
+				if (actualPiece != null && to!=null && attacked ==false)
 				{
 					Debug.Log ("ruch bez bicia");
-					actualPiece.piece.transform.position = to.plane.transform.position;
+					actualPiece.piece.transform.position = to.plane.transform.position; // TODO: movement animation
+					forceAttack = false;
 					to=null;
 				}
 				
 				if(forceAttack != true)
 				{
 					Debug.Log ("koniec tury");
+					attacked = false;
 					MovementDone();
 				}
 
@@ -142,7 +163,7 @@ public class GameController : MonoBehaviour {
 
 	}
 
-	void FixedUpdate()
+	void Update()
 	{//debug 
 		if (lastPiece!=null&&lastPiece.piece!=null&&lastPiece.piece.currentGameObject!=null)lastPiece1 = lastPiece.piece.currentGameObject;
 		if (actualPiece!=null&&actualPiece.piece!=null&&actualPiece.piece.currentGameObject!=null)actualPiece1 = actualPiece.piece.currentGameObject;
@@ -298,12 +319,15 @@ public class GameController : MonoBehaviour {
 			if(ChessboardControllerScript.Board[actualX - 1, actualY + colour].piece== null)
 			{
 			possibleDestinations[0] = ChessboardControllerScript.Board[actualX - 1, actualY + colour];
+
 			}
 			else
-			{ 
-				if(ChessboardControllerScript.Board[actualX - 2, actualY + colour*2].piece== null)
+			{ 	if ((actualX - 2) >= 0 && (actualX - 2) <= 7 && (actualY + colour*2) >= 0 && (actualY + colour*2) <= 7 )
+				if(ChessboardControllerScript.Board[actualX - 2, actualY + colour*2].piece== null && ChessboardControllerScript.Board[actualX - 1, actualY + colour].piece.Allegiance != GameControllerScript.turnAlligiance)
+				{
 				possibleDestinations[0] = ChessboardControllerScript.Board[actualX - 2, actualY + colour*2];
 				needToAttack=true;
+				}
 			}
 			
 		}
@@ -313,10 +337,11 @@ public class GameController : MonoBehaviour {
 			if(ChessboardControllerScript.Board[actualX + 1, actualY + colour].piece== null)
 			{
 				possibleDestinations[1] = ChessboardControllerScript.Board[actualX + 1, actualY + colour];
+
 			}
 			else
-			{ 
-				if(ChessboardControllerScript.Board[actualX + 2, actualY + colour*2].piece== null)
+			{ 	if ((actualX + 2) >=0 && (actualX + 2) <= 7 && (actualY + colour*2) >= 0 && (actualY + colour*2) <= 7)
+				if(ChessboardControllerScript.Board[actualX + 2, actualY + colour*2].piece== null&& ChessboardControllerScript.Board[actualX + 1, actualY + colour].piece.Allegiance != GameControllerScript.turnAlligiance)
 				{
 					possibleDestinations[1] = ChessboardControllerScript.Board[actualX + 2, actualY + colour*2];
 					needToAttack=true;
@@ -327,30 +352,32 @@ public class GameController : MonoBehaviour {
 		possibleDestinations[3] = null;
 		if(isKing)
 		{
-			if ((actualX - 1) >= 0 && (actualY - colour) >= 0 && (actualY - colour) <= 7)
+			if ((actualX - 1) >= 0 &&  (actualX - 1) <= 7 && (actualY - colour) >= 0 && (actualY - colour) <= 7)
 			{
 				if(ChessboardControllerScript.Board[actualX - 1, actualY - colour].piece== null)
 				{
 					possibleDestinations[2] = ChessboardControllerScript.Board[actualX - 1, actualY - colour];
+
 				}
 				else
-				{ 
-					if(ChessboardControllerScript.Board[actualX - 2, actualY - colour*2].piece== null)
+				{   if ((actualX - 2) >= 0 &&  (actualX - 2) <= 7 && (actualY - colour*2) >= 0 && (actualY - colour*2) <= 7)
+					if(ChessboardControllerScript.Board[actualX - 2, actualY - colour*2].piece== null && ChessboardControllerScript.Board[actualX - 1, actualY - colour].piece.Allegiance != GameControllerScript.turnAlligiance)
 					{
 						possibleDestinations[2] = ChessboardControllerScript.Board[actualX - 2, actualY - colour*2];
 						needToAttack=true;
 					}
 				}
 			}
-			if ((actualX + 1) <= 7 && (actualY - colour) >= 0 && (actualY - colour) <= 7)
+			if ((actualX + 1) >= 0 && (actualX + 1) <= 7 && (actualY - colour) >= 0 && (actualY - colour) <= 7)
 			{
 				if(ChessboardControllerScript.Board[actualX + 1, actualY - colour].piece== null)
 				{
 					possibleDestinations[3] = ChessboardControllerScript.Board[actualX + 1, actualY - colour];
+
 				}
 				else
-				{ 
-					if(ChessboardControllerScript.Board[actualX + 2, actualY - colour*2].piece== null)
+				{   if ((actualX + 2) >= 0 && (actualX + 2) <= 7 && (actualY - colour*2) >= 0 && (actualY - colour*2) <= 7)
+					if(ChessboardControllerScript.Board[actualX + 2, actualY - colour*2].piece== null && ChessboardControllerScript.Board[actualX + 1, actualY - colour].piece.Allegiance != GameControllerScript.turnAlligiance)
 					{
 						possibleDestinations[3] = ChessboardControllerScript.Board[actualX + 2, actualY - colour*2];
 						needToAttack=true;
