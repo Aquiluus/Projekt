@@ -54,6 +54,8 @@
      <Compile Include="Assets\Panther\Demo Scene\MoveTrack.js" />
      <Compile Include="Assets\Panther\Demo Scene\MoveTurret.js" />
      <Compile Include="Assets\Scripts\AnimationSpriteSheet.js" />
+     <None Include="Assets\Standard Assets\Skyboxes\_skybox info.txt" />
+     <None Include="Assets\Textures\milestone Beta.txt" />
  <Reference Include="TouchScript">
  <HintPath>I:/STUDIA/GK/projekt/Projekt/trunk/Assets/TouchScript/Plugins/TouchScript.dll</HintPath>
  </Reference>

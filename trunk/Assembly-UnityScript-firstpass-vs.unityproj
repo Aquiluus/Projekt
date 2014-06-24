@@ -51,6 +51,8 @@
      <Compile Include="Assets\Plugins\FT_FreeSample\Script\SampleSceneGUI.js" />
      <Compile Include="Assets\Plugins\FT_FreeSample\Script\StopCAM.js" />
      <Compile Include="Assets\Plugins\FT_FreeSample\Script\VisibleBG.js" />
+     <None Include="Assets\Standard Assets\Skyboxes\_skybox info.txt" />
+     <None Include="Assets\Textures\milestone Beta.txt" />
  <Reference Include="TouchScript">
  <HintPath>I:/STUDIA/GK/projekt/Projekt/trunk/Assets/TouchScript/Plugins/TouchScript.dll</HintPath>
  </Reference>

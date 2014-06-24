@@ -47,6 +47,8 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Plugins\FT_FreeSample\Script\Button.cs" />
+     <None Include="Assets\Standard Assets\Skyboxes\_skybox info.txt" />
+     <None Include="Assets\Textures\milestone Beta.txt" />
  <Reference Include="TouchScript">
  <HintPath>I:/STUDIA/GK/projekt/Projekt/trunk/Assets/TouchScript/Plugins/TouchScript.dll</HintPath>
  </Reference>
