@@ -50,8 +50,15 @@
      <Compile Include="Assets\Scripts\AlphaNumericSort.cs" />
      <Compile Include="Assets\Scripts\ChessboardController.cs" />
      <Compile Include="Assets\Scripts\GameController.cs" />
+     <Compile Include="Assets\Scripts\Panther Scripts\AutoDestroy.cs" />
+     <Compile Include="Assets\Scripts\Panther Scripts\Ball.cs" />
+     <Compile Include="Assets\Scripts\Panther Scripts\MoveGun.cs" />
+     <Compile Include="Assets\Scripts\Panther Scripts\MoveTank.cs" />
+     <Compile Include="Assets\Scripts\Panther Scripts\MoveTrack.cs" />
+     <Compile Include="Assets\Scripts\Panther Scripts\MoveTurret.cs" />
      <Compile Include="Assets\Scripts\PieceController.cs" />
      <Compile Include="Assets\Scripts\PlaneController.cs" />
+     <None Include="Assets\Textures\milestone Beta.txt" />
  <Reference Include="TouchScript">
  <HintPath>C:/Users/Aquiluus/Projekt/trunk/Assets/TouchScript/Plugins/TouchScript.dll</HintPath>
  </Reference>

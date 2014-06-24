@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Plugins\FT_FreeSample\Script\Button.cs" />
+     <None Include="Assets\Textures\milestone Beta.txt" />
  <Reference Include="TouchScript">
  <HintPath>C:/Users/Aquiluus/Projekt/trunk/Assets/TouchScript/Plugins/TouchScript.dll</HintPath>
  </Reference>

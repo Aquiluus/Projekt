@@ -47,13 +47,8 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Models\lowpolyblocks\scripts\FPSWalker.js" />
-     <Compile Include="Assets\Panther\Demo Scene\AutoDestroy.js" />
-     <Compile Include="Assets\Panther\Demo Scene\Ball.js" />
-     <Compile Include="Assets\Panther\Demo Scene\MoveGun.js" />
-     <Compile Include="Assets\Panther\Demo Scene\MoveTank.js" />
-     <Compile Include="Assets\Panther\Demo Scene\MoveTrack.js" />
-     <Compile Include="Assets\Panther\Demo Scene\MoveTurret.js" />
      <Compile Include="Assets\Scripts\AnimationSpriteSheet.js" />
+     <None Include="Assets\Textures\milestone Beta.txt" />
  <Reference Include="Assembly-UnityScript-firstpass">
  <HintPath>C:/Users/Aquiluus/Projekt/trunk/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
  </Reference>

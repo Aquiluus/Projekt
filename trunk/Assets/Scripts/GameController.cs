@@ -86,8 +86,13 @@ public class GameController : MonoBehaviour {
 					PieceController tempPiece;
 					Debug.Log("bicie!");
 					attacked = true;
-					if ( DestroyPiece())		// TODO: Destroy Animation
-					actualPiece.piece.transform.position = to.plane.transform.position; // TODO: movement animation
+                    if (DestroyPiece()) // TODO: Destroy Animation
+                    {
+                        Debug.Log("bicie!");
+                        Vector3 temp = new Vector3(to.plane.transform.position.x, to.plane.transform.position.y + 0.2f, to.plane.transform.position.z);
+                        actualPiece.piece.transform.position = temp; // TODO: movement animation
+                    }
+                    
 
 					tempPiece = actualPiece.piece;
 					WaitFor1Sec();
@@ -143,7 +148,8 @@ public class GameController : MonoBehaviour {
 				if (actualPiece != null && to!=null && attacked ==false)
 				{
 					Debug.Log ("ruch bez bicia");
-					actualPiece.piece.transform.position = to.plane.transform.position; // TODO: movement animation
+                    Vector3 temp = new Vector3(to.plane.transform.position.x, to.plane.transform.position.y + 0.2f, to.plane.transform.position.z);
+                    actualPiece.piece.transform.position = temp; // TODO: movement animation
 					forceAttack = false;
 					to=null;
 				}
