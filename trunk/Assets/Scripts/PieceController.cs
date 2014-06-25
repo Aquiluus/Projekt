@@ -12,6 +12,7 @@ public class PieceController : MonoBehaviour {
         public Collider OcupiedPlane;
         public GameObject particleSystem;
 		public GameObject currentGameObject;
+        public GameObject ownTank;
       
         private ChessboardController ChessboardControllerScript;
         private GameController GameControllerScript;
@@ -24,6 +25,15 @@ public class PieceController : MonoBehaviour {
          AddAligiance();
          AddParticle();
          this.IsKing = false;
+
+         foreach (Transform child in transform)
+         {
+             if (child.gameObject.tag == "Panther")
+             {
+                 ownTank = child.gameObject;
+                 break;
+             }
+         }
       }
 
     

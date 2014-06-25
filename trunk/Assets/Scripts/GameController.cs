@@ -12,6 +12,10 @@ public class GameController : MonoBehaviour {
     public ChessboardPlane to;
 	public GameObject toPlane1;
     public ChessboardPlane[] possibleDestinations;
+    public float pieceHeightMargin = 0.2f;
+    public float currAngle = 0.0f;
+    public bool turned = false;
+    public bool turnDone;
 
     public Camera gameCamera;
 
@@ -46,6 +50,7 @@ public class GameController : MonoBehaviour {
 		possibleDestinations = new ChessboardPlane[4];
 		cameraAnimator = gameCamera.GetComponent<Animator> ();
 		possibleDestinations = new ChessboardPlane[4];
+        turnDone = false;
 	}
 
 
@@ -57,15 +62,20 @@ public class GameController : MonoBehaviour {
     }
 	IEnumerator WaitFor1Sec(){
 
-		 yield return new WaitForSeconds(1);
+		 yield return new WaitForSeconds(1.0F);
 	}
 
-
+    IEnumerator WaitFor3Sec()
+    {
+        yield return new WaitForSeconds(3.0f);
+    }
 	
 	// Update is called once per frame
-	void FixedUpdate () 
+	void Update () 
 	{
 		bool attacked= false;
+        bool moveDone = false;
+       
 
         //PreTurnSetting();
 
@@ -89,8 +99,9 @@ public class GameController : MonoBehaviour {
                     if (DestroyPiece()) // TODO: Destroy Animation
                     {
                         Debug.Log("bicie!");
-                        Vector3 temp = new Vector3(to.plane.transform.position.x, to.plane.transform.position.y + 0.2f, to.plane.transform.position.z);
+                        Vector3 temp = new Vector3(to.plane.transform.position.x, to.plane.transform.position.y + pieceHeightMargin, to.plane.transform.position.z);
                         actualPiece.piece.transform.position = temp; // TODO: movement animation
+                        //MovePiece();
                     }
                     
 
@@ -116,14 +127,7 @@ public class GameController : MonoBehaviour {
 									{
 										forceAttack = true;
 										Debug.Log ("bedzie force attack zapale lampkę na "+ destination.plane.gameObject.name);
-										foreach (ChessboardPlane colorPiece in ChessboardControllerScript.Board)
-										{
-											if (colorPiece.piece != null && colorPiece.piece.Allegiance == turnAlligiance)
-											{
-												colorPiece.piece.GetComponent<TapGesture>().enabled = false;
-											}
-										}
-										actualPiece.piece.GetComponent<TapGesture>().enabled = true;
+                                        BlockOtherPieces();
 										destination.particleSystem.SetActive(true);
 										
 									}else
@@ -145,20 +149,31 @@ public class GameController : MonoBehaviour {
 
 				
 			}
-				if (actualPiece != null && to!=null && attacked ==false)
+				if (actualPiece !=null && to!=null && attacked ==false)
 				{
+                    
 					Debug.Log ("ruch bez bicia");
-                    Vector3 temp = new Vector3(to.plane.transform.position.x, to.plane.transform.position.y + 0.2f, to.plane.transform.position.z);
-                    actualPiece.piece.transform.position = temp; // TODO: movement animation
+                    
+                    currAngle = FindAngle(actualPiece.piece.ownTank.transform.position, to.plane.transform.position, actualPiece.piece.ownTank.transform.up);
+                    Debug.Log("Kąt: " + currAngle);
+
+                    
+                    MovePiece();
+
+                    //actualPiece.piece.transform.position = temp; // TODO: movement animation
 					forceAttack = false;
 					to=null;
 				}
-				
-				if(forceAttack != true)
+               
+				if(forceAttack != true && moveDone == true)
 				{
 					Debug.Log ("koniec tury");
 					attacked = false;
 					MovementDone();
+                    forceAttack = false;
+                    actualPiece = null;
+                    to = null;
+                    moveDone = false;
 				}
 
         }
@@ -169,7 +184,174 @@ public class GameController : MonoBehaviour {
 
 	}
 
-	void Update()
+    void MovePiece()
+    {
+        if (to.plane.transform.position.z < actualPiece.plane.transform.position.z)
+        {
+            if (turnDone == false)
+            {
+                ClearPossibleDestinations();
+                if (this.turnAlligiance == Allegiance.black)
+                    if (to.plane.transform.position.x > actualPiece.plane.transform.position.x)
+                    {
+                        //BlockOtherPlanes();
+                        StartCoroutine(TurnAnimation(1));
+                    }
+                    else
+                    {
+                       // BlockOtherPlanes();
+                        StartCoroutine(TurnAnimation(2));
+                    }
+                else
+                    if (to.plane.transform.position.x < actualPiece.plane.transform.position.x)
+                    {
+                       // BlockOtherPlanes();
+                        StartCoroutine(TurnAnimation(-1));
+                    }
+                    else
+                    {
+                       // BlockOtherPlanes();
+                        StartCoroutine(TurnAnimation(-2));
+                    }
+
+
+                turnDone = true;
+                BlockOtherPieces();
+            }
+            else
+            {
+                forceAttack = false;
+                if (this.turnAlligiance == Allegiance.black)
+                    if (to.plane.transform.position.x > actualPiece.plane.transform.position.x)
+                    {
+                       // BlockOtherPlanes();
+                        StartCoroutine(TurnBackAnimation(1));
+                    }
+                    else
+                    {
+                       // BlockOtherPlanes();
+                        StartCoroutine(TurnBackAnimation(2));
+                    }
+                else
+                    if (to.plane.transform.position.x < actualPiece.plane.transform.position.x)
+                    {
+                      //  BlockOtherPlanes();
+                        StartCoroutine(TurnBackAnimation(-1));
+                    }
+                    else
+                    {
+                       // BlockOtherPlanes();
+                        StartCoroutine(TurnBackAnimation(-2));
+                    }
+                turnDone = false;
+                MovementDone();
+            }
+
+        }
+        else if (to.plane.transform.position.z > actualPiece.plane.transform.position.z)
+        {
+            if (turnDone == false)
+            {
+                ClearPossibleDestinations();
+                if (this.turnAlligiance == Allegiance.black)
+                    if (to.plane.transform.position.x > actualPiece.plane.transform.position.x)
+                        StartCoroutine(TurnAnimation(-1));
+                    else
+                        StartCoroutine(TurnAnimation(-2));
+                else
+                    if (to.plane.transform.position.x < actualPiece.plane.transform.position.x)
+                        StartCoroutine(TurnAnimation(1));
+                    else
+                        StartCoroutine(TurnAnimation(2));
+
+
+                turnDone = true;
+                BlockOtherPieces();
+            }
+            else
+            {
+                forceAttack = false;
+                if (this.turnAlligiance == Allegiance.black)
+                    if (to.plane.transform.position.x > actualPiece.plane.transform.position.x)
+                        StartCoroutine(TurnBackAnimation(-1));
+                    else
+                        StartCoroutine(TurnBackAnimation(-2));
+                else
+                    if (to.plane.transform.position.x < actualPiece.plane.transform.position.x)
+                        StartCoroutine(TurnBackAnimation(1));
+                    else
+                        StartCoroutine(TurnBackAnimation(2));
+                turnDone = false;
+                MovementDone();
+            }
+
+        }
+
+
+    }
+
+
+
+    IEnumerator TurnAnimation(int side)
+    {
+        
+        if( side == -1)
+        actualPiece.piece.GetComponent<Animator>().SetTrigger("turnLeft45");
+        else if (side == 1)
+        actualPiece.piece.GetComponent<Animator>().SetTrigger("turnRight45");
+        if (side == -2)
+            actualPiece.piece.GetComponent<Animator>().SetTrigger("turnLeft135");
+        else if (side == 2)
+            actualPiece.piece.GetComponent<Animator>().SetTrigger("turnRight135");
+        yield return new WaitForSeconds(1);
+     
+    }
+
+    IEnumerator TurnBackAnimation(int side)
+    {
+        Vector3 temp = new Vector3(to.plane.transform.position.x, to.plane.transform.position.y + pieceHeightMargin, to.plane.transform.position.z);
+        actualPiece.piece.transform.position = temp;
+        if (side == -1)
+            actualPiece.piece.GetComponent<Animator>().SetTrigger("turnStraightFromLeft45");
+        else if (side == 1)
+            actualPiece.piece.GetComponent<Animator>().SetTrigger("turnStraightFromRight45");
+        if (side == -2)
+            actualPiece.piece.GetComponent<Animator>().SetTrigger("turnStraightFromLeft135");
+        else if (side == 2)
+            actualPiece.piece.GetComponent<Animator>().SetTrigger("turnStraightFromRight135");
+        yield return new WaitForSeconds(1);
+
+    }
+
+    void BlockOtherPieces()
+    {
+        foreach (ChessboardPlane colorPiece in ChessboardControllerScript.Board)
+        {
+            if (colorPiece.piece != null && colorPiece.piece.Allegiance == turnAlligiance)
+            {
+                colorPiece.piece.GetComponent<TapGesture>().enabled = false;
+            }
+        }
+        actualPiece.piece.GetComponent<TapGesture>().enabled = true;
+
+    }
+
+    void BlockOtherPlanes()
+    {
+        foreach (ChessboardPlane colorPiece in ChessboardControllerScript.Board)
+        {
+            if (colorPiece.plane != null)
+            {
+                colorPiece.plane.GetComponent<TapGesture>().enabled = false;
+                colorPiece.particleSystem.SetActive(false);
+            }
+        }
+        to.plane.GetComponent<TapGesture>().enabled = true;
+        to.particleSystem.SetActive(true);
+
+    }
+
+	void FixedUpdate()
 	{//debug 
 		if (lastPiece!=null&&lastPiece.piece!=null&&lastPiece.piece.currentGameObject!=null)lastPiece1 = lastPiece.piece.currentGameObject;
 		if (actualPiece!=null&&actualPiece.piece!=null&&actualPiece.piece.currentGameObject!=null)actualPiece1 = actualPiece.piece.currentGameObject;
@@ -242,15 +424,13 @@ public class GameController : MonoBehaviour {
 
 	void MovementDone()
 	{
-		ClearPossibleDestinations();
-		to = null;
-		actualPiece = null;
-		PostTurnSetting();
-		PreTurnSetting();
-
+            ClearPossibleDestinations();
+            to = null;
+            actualPiece = null;
+            PostTurnSetting();
+            PreTurnSetting();
 	}
 
-	
 	void PostTurnSetting()
 	{
 		if (turnAlligiance == Allegiance.white)
@@ -288,7 +468,6 @@ public class GameController : MonoBehaviour {
 		}
 		
 	}
-
 
     void ActivatePossibleDestinations()
     {
@@ -409,10 +588,6 @@ public class GameController : MonoBehaviour {
 
     }
 
-
-
-
-
     int AllegianceToInteger(Allegiance allegiance)
     {
         if (allegiance == Allegiance.black)
@@ -427,5 +602,19 @@ public class GameController : MonoBehaviour {
         {
             return 0;
         }
+    }
+
+    float FindAngle(Vector3 fromVector, Vector3 toVector, Vector3 upVector)
+    {
+        if (toVector == Vector3.zero)
+        {
+            return 0.0f;
+        }
+        float angle = Vector3.Angle(fromVector, toVector);
+        Vector3 normal = Vector3.Cross(fromVector, toVector);
+        angle *= Mathf.Sign(Vector3.Dot(normal, upVector));
+        angle *= Mathf.Deg2Rad;
+
+        return angle;
     }
 }

@@ -58,6 +58,7 @@
      <Compile Include="Assets\Scripts\Panther Scripts\MoveTurret.cs" />
      <Compile Include="Assets\Scripts\PieceController.cs" />
      <Compile Include="Assets\Scripts\PlaneController.cs" />
+     <None Include="Assets\Standard Assets\Skyboxes\_skybox info.txt" />
      <None Include="Assets\Textures\milestone Beta.txt" />
  <Reference Include="Assembly-UnityScript-firstpass">
  <HintPath>C:/Users/Aquiluus/Projekt/trunk/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>

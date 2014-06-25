@@ -48,6 +48,7 @@
   <ItemGroup>
      <Compile Include="Assets\Models\lowpolyblocks\scripts\FPSWalker.js" />
      <Compile Include="Assets\Scripts\AnimationSpriteSheet.js" />
+     <None Include="Assets\Standard Assets\Skyboxes\_skybox info.txt" />
      <None Include="Assets\Textures\milestone Beta.txt" />
  <Reference Include="TouchScript">
  <HintPath>C:/Users/Aquiluus/Projekt/trunk/Assets/TouchScript/Plugins/TouchScript.dll</HintPath>

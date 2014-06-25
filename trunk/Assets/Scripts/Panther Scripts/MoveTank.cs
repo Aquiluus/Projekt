@@ -12,10 +12,16 @@ public class MoveTank : MonoBehaviour {
     public GameObject bulletObject;
     public GameObject fireEffect;
     public float fireRate;
+    public float angle = 0.0f;
+    public float maxAngle = 130.0f;
+
+    public int turn = 0;
+    public int drive = 0;
  
     private MoveTrack leftTrack;
     private MoveTrack rightTrack;
     private float nextFire;
+    private GameController gameController;
   
 
 
@@ -23,10 +29,43 @@ public class MoveTank : MonoBehaviour {
     {
         leftTrack = GameObject.Find(gameObject.name + "/Lefttrack").GetComponent<MoveTrack>();
         rightTrack = GameObject.Find(gameObject.name + "/Righttrack").GetComponent<MoveTrack>();
+        gameController = GameObject.Find("GameController").GetComponent<GameController>();
     }
 
     void Update()
     {
+
+        //switch (turn)
+        //{
+        //    case 0:
+        //        break;
+        //    case 1:
+        //        if (angle < maxAngle)
+        //        {
+        //            TurnLeft();
+        //            angle += 1.0f;
+        //        }
+        //        else
+        //        {
+        //            angle = 0.0f;
+        //            turn = 0;
+        //            gameController.turned = true;
+        //        }
+        //        break;
+        //    case 2:
+        //        if (angle < maxAngle)
+        //        {
+        //            TurnRight();
+        //            angle += 1.0f;
+        //        }
+        //        else
+        //        {
+        //            angle = 0.0f;
+        //            turn = 0;
+        //            gameController.turned = true;
+        //        }
+        //        break;
+        //}
         if (Input.GetKey(KeyCode.UpArrow))
         {
             if (currentVelocity <= maxForwardSpeed)
@@ -60,75 +99,46 @@ public class MoveTank : MonoBehaviour {
 
         transform.Translate(new Vector3(0, 0, currentVelocity * Time.deltaTime));
 
-        if(currentVelocity > 0)
+        if (currentVelocity > 0)
         {
             SetTrackAnimation(currentVelocity, 1, 1);
-            //leftTrack.speed = currentVelocity;
-            //leftTrack.gearStatus = 1;
-            //rightTrack.speed = currentVelocity;
-            //rightTrack.gearStatus = 1;
         }
         else if (currentVelocity < 0)
         {
             SetTrackAnimation(-currentVelocity, 2, 2);
-            //leftTrack.speed = -currentVelocity;
-            //leftTrack.gearStatus = 2;
-            //rightTrack.speed = -currentVelocity;
-            //rightTrack.gearStatus = 2;
         }
         else
         {
             SetTrackAnimation(0, 0, 0);
-            //leftTrack.gearStatus = 0;
-            //rightTrack.gearStatus = 0;
         }
 
-        if(Input.GetKey (KeyCode.LeftArrow))
+        if (Input.GetKey(KeyCode.LeftArrow))
         {
-            if(Input.GetKey(KeyCode.DownArrow))
+            if (Input.GetKey(KeyCode.DownArrow))
             {
-                transform.Rotate(new Vector3(0, rotationSpeed * Time.deltaTime, 0));
-                SetTrackAnimation(rotationSpeed / 2, 1, 2);
-                //leftTrack.speed = rotationSpeed/2;
-                //leftTrack.gearStatus = 1;
-                //rightTrack.speed = rotationSpeed/2;
-                //rightTrack.gearStatus = 2;
+                TurnRight();
             }
             else
             {
-                transform.Rotate(new Vector3(0, -rotationSpeed * Time.deltaTime, 0));
-                SetTrackAnimation(rotationSpeed / 2, 2, 1);
-                //leftTrack.speed = rotationSpeed/2;
-                //leftTrack.gearStatus = 2;
-                //leftTrack.speed = rotationSpeed/2;
-                //rightTrack.gearStatus = 1;
+                TurnLeft();
             }
         }
 
-        if(Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKey(KeyCode.RightArrow))
         {
-            if(Input.GetKey(KeyCode.DownArrow))
+            if (Input.GetKey(KeyCode.DownArrow))
             {
-                transform.Rotate(new Vector3(0, -rotationSpeed * Time.deltaTime, 0));
-                SetTrackAnimation(rotationSpeed / 2, 2, 1);
-                //leftTrack.speed = rotationSpeed/2;
-                //leftTrack.gearStatus = 2;
-                //rightTrack.speed = rotationSpeed/2;
-                //rightTrack.gearStatus = 1;
+                TurnLeft();
             }
             else
             {
-                transform.Rotate(new Vector3(0, rotationSpeed * Time.deltaTime, 0));
-                SetTrackAnimation(rotationSpeed / 2, 1, 2);
-                //leftTrack.speed = rotationSpeed/2;
-                //leftTrack.gearStatus = 1;
-                //rightTrack.speed = rotationSpeed/2;
-                //rightTrack.gearStatus = 2;
+                TurnRight();
             }
         }
 
-        if (Input.GetKey(KeyCode.LeftControl) && Time.time > nextFire) {
-			nextFire = Time.time + fireRate;
+        if (Input.GetKey(KeyCode.LeftControl) && Time.time > nextFire)
+        {
+            nextFire = Time.time + fireRate;
             Instantiate(fireEffect, spawnPoint.position, spawnPoint.rotation);
             Instantiate(bulletObject, spawnPoint.position, spawnPoint.rotation);
         }
@@ -141,4 +151,24 @@ public class MoveTank : MonoBehaviour {
         leftTrack.gearStatus = leftTrackStatus;
         rightTrack.gearStatus = rightTrackStatus;
     }
+
+    public void TurnLeft()
+    {
+            transform.Rotate(new Vector3(0, -rotationSpeed * Time.deltaTime, 0));
+            SetTrackAnimation(rotationSpeed / 2, 2, 1);
+    }
+
+    public void TurnRight()
+    {
+            transform.Rotate(new Vector3(0, rotationSpeed * Time.deltaTime, 0));
+            SetTrackAnimation(rotationSpeed / 2, 1, 2);
+    }
+
+    public void DriveForward()
+    {
+        currentVelocity += acceleration * Time.deltaTime;
+        transform.Translate(new Vector3(0, 0, currentVelocity * Time.deltaTime));
+        SetTrackAnimation(currentVelocity, 1, 1);
+    }
 }
+
