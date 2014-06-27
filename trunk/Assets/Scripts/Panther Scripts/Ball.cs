@@ -7,8 +7,16 @@ public class Ball : MonoBehaviour {
     public float range = 400;
     public GameObject ExplosionParticle;
 
+
     private float dist;
-	
+	private GameController gameController;
+
+	void Awake()
+	{
+	 	gameController = GameObject.Find("GameController").GetComponent<GameController>();
+
+	}
+
 	// Update is called once per frame
 	void Update () 
     {
@@ -20,11 +28,14 @@ public class Ball : MonoBehaviour {
             Instantiate(ExplosionParticle, transform.position, transform.rotation);
             Destroy(gameObject);
         }
+
 	}
 
     void OnTriggerEnter(Collider other)
     {
         Instantiate(ExplosionParticle, transform.position, transform.rotation);
         Destroy(gameObject);
+		gameController.doneExternalDestroy = true;
+		Destroy (other.gameObject);
     }
 }

@@ -134,21 +134,27 @@ public class PieceController : MonoBehaviour {
 
     void OnTriggerEnter(Collider other)
     {
-        OcupiedPlane = other;
+		if (other.gameObject.tag == "Plane") 
+		{
+				OcupiedPlane = other;
 
-        int pirsza = other.name[6] - '0'; // kurwa jak ? 
-        int drugo = other.name[7] - '0'; // nie wieże 
-        ChessboardControllerScript.Board[pirsza-1, drugo-1].piece = this;
+				int pirsza = other.name [6] - '0'; // kurwa jak ? 
+				int drugo = other.name [7] - '0'; // nie wieże 
+				ChessboardControllerScript.Board [pirsza - 1, drugo - 1].piece = this;
 
-		CheckIfKing (ChessboardControllerScript.Board[pirsza-1, drugo-1]);
+				CheckIfKing (ChessboardControllerScript.Board [pirsza - 1, drugo - 1]);
+		}
     }
 
     void OnTriggerExit(Collider other)
     {
-        int pirsza = other.name[6] - '0'; // kurwa jak ? 
-        int drugo = other.name[7] - '0'; // nie wieże 
-        ChessboardControllerScript.Board[pirsza - 1, drugo - 1].piece.particleSystem.SetActive(false);
-        ChessboardControllerScript.Board[pirsza - 1, drugo - 1].piece = null;
+		if (other.gameObject.tag == "Plane") 
+		{
+				int pirsza = other.name [6] - '0'; // kurwa jak ? 
+				int drugo = other.name [7] - '0'; // nie wieże 
+				ChessboardControllerScript.Board [pirsza - 1, drugo - 1].piece.particleSystem.SetActive (false);
+				ChessboardControllerScript.Board [pirsza - 1, drugo - 1].piece = null;
+		}
     }
 
 

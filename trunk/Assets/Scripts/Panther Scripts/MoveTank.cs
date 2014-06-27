@@ -14,6 +14,9 @@ public class MoveTank : MonoBehaviour {
     public float fireRate;
     public float angle = 0.0f;
     public float maxAngle = 130.0f;
+	public bool shootAnim = false;
+	public GameObject ExplosionParticle;
+	public GameObject Piece;
 
     public int turn = 0;
     public int drive = 0;
@@ -30,42 +33,19 @@ public class MoveTank : MonoBehaviour {
         leftTrack = GameObject.Find(gameObject.name + "/Lefttrack").GetComponent<MoveTrack>();
         rightTrack = GameObject.Find(gameObject.name + "/Righttrack").GetComponent<MoveTrack>();
         gameController = GameObject.Find("GameController").GetComponent<GameController>();
+		shootAnim = false;
+		nextFire = 3.0F;
+		ExplosionParticle = GameObject.Find("BigExplosionEffect");
     }
 
     void Update()
     {
+		if (shootAnim == true && Time.time > nextFire) 
+		{
+			Shoot();
+			shootAnim=false;
+		}
 
-        //switch (turn)
-        //{
-        //    case 0:
-        //        break;
-        //    case 1:
-        //        if (angle < maxAngle)
-        //        {
-        //            TurnLeft();
-        //            angle += 1.0f;
-        //        }
-        //        else
-        //        {
-        //            angle = 0.0f;
-        //            turn = 0;
-        //            gameController.turned = true;
-        //        }
-        //        break;
-        //    case 2:
-        //        if (angle < maxAngle)
-        //        {
-        //            TurnRight();
-        //            angle += 1.0f;
-        //        }
-        //        else
-        //        {
-        //            angle = 0.0f;
-        //            turn = 0;
-        //            gameController.turned = true;
-        //        }
-        //        break;
-        //}
         if (Input.GetKey(KeyCode.UpArrow))
         {
             if (currentVelocity <= maxForwardSpeed)
@@ -138,11 +118,18 @@ public class MoveTank : MonoBehaviour {
 
         if (Input.GetKey(KeyCode.LeftControl) && Time.time > nextFire)
         {
-            nextFire = Time.time + fireRate;
-            Instantiate(fireEffect, spawnPoint.position, spawnPoint.rotation);
-            Instantiate(bulletObject, spawnPoint.position, spawnPoint.rotation);
+			Shoot ();
         }
     }
+
+
+public void Shoot()
+	{
+		nextFire = Time.time + fireRate;
+		Instantiate(fireEffect, spawnPoint.position, spawnPoint.rotation);
+		Instantiate(bulletObject, spawnPoint.position, spawnPoint.rotation);
+
+	}
 
     void SetTrackAnimation(float speed, int leftTrackStatus, int rightTrackStatus)
     {
@@ -170,5 +157,6 @@ public class MoveTank : MonoBehaviour {
         transform.Translate(new Vector3(0, 0, currentVelocity * Time.deltaTime));
         SetTrackAnimation(currentVelocity, 1, 1);
     }
+
 }
 

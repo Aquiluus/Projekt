@@ -16,11 +16,15 @@ public class GameController : MonoBehaviour {
     public float currAngle = 0.0f;
     public bool turned = false;
     public bool turnDone;
+	public float maxSpeed;
 
     public Camera gameCamera;
 
 	public GameObject whiteWins;
 	public GameObject blackWins;
+
+	public ChessboardPlane toDestroy;
+	public GameObject gameObjectToDestroy;
 
 	private int whiteCount = 12;
 	private int blackCount = 12;
@@ -29,13 +33,19 @@ public class GameController : MonoBehaviour {
     private ChessboardController ChessboardControllerScript;
     private GameController GameControllerScript;
 
+	private PieceController tempPiece;
+
+
+
 	public bool forceAttack;
+	public bool doneDestroy;
+	public bool doneExternalDestroy;
+
     public Allegiance turnAlligiance = Allegiance.white;
 
     // TODO : camera animation
-    private Vector3 cameraWhitePosition = new Vector3(215.0f, 535.0f, -327.5f);
+   
     private Quaternion cameraWhiteRotation = Quaternion.Euler(new Vector3(45.0f, -90.0f, 0.0f));
-    private Vector3 cameraBlackPosition = new Vector3(203.0f, 535.0f, -327.5f);
     private Quaternion cameraBlackRotation = Quaternion.Euler(new Vector3(45.0f, 90.0f, 0.0f));
 
 
@@ -51,6 +61,8 @@ public class GameController : MonoBehaviour {
 		cameraAnimator = gameCamera.GetComponent<Animator> ();
 		possibleDestinations = new ChessboardPlane[4];
         turnDone = false;
+		doneDestroy = false;
+		doneExternalDestroy = false;
 	}
 
 
@@ -69,6 +81,60 @@ public class GameController : MonoBehaviour {
     {
         yield return new WaitForSeconds(3.0f);
     }
+
+	
+	IEnumerator TurnAnimation(int side)
+	{
+		
+		if( side == -1)
+			actualPiece.piece.GetComponent<Animator>().SetTrigger("turnLeft45");
+		else if (side == 1)
+			actualPiece.piece.GetComponent<Animator>().SetTrigger("turnRight45");
+		if (side == -2)
+			actualPiece.piece.GetComponent<Animator>().SetTrigger("turnLeft135");
+		else if (side == 2)
+			actualPiece.piece.GetComponent<Animator>().SetTrigger("turnRight135");
+		yield return new WaitForSeconds(1);
+		
+	}
+
+	IEnumerator IdleAnimation()
+	{
+
+		actualPiece.piece.GetComponent<Animator>().SetTrigger("turnLeft135");
+		yield return new WaitForSeconds(1);
+	}
+	
+	IEnumerator TurnBackAnimation(int side)
+	{
+		Vector3 temp = new Vector3(to.plane.transform.position.x, to.plane.transform.position.y + pieceHeightMargin, to.plane.transform.position.z);
+		actualPiece.piece.transform.position = temp;
+		if (side == -1)
+			actualPiece.piece.GetComponent<Animator>().SetTrigger("turnStraightFromLeft45");
+		else if (side == 1)
+			actualPiece.piece.GetComponent<Animator>().SetTrigger("turnStraightFromRight45");
+		if (side == -2)
+			actualPiece.piece.GetComponent<Animator>().SetTrigger("turnStraightFromLeft135");
+		else if (side == 2)
+			actualPiece.piece.GetComponent<Animator>().SetTrigger("turnStraightFromRight135");
+		yield return new WaitForSeconds(1);
+		
+	}
+
+	IEnumerator AttackAnimation (int side)
+	{
+		if( side == -1)
+			actualPiece.piece.GetComponent<Animator>().SetTrigger("attackLeft");
+		else if (side == 1)
+			actualPiece.piece.GetComponent<Animator>().SetTrigger("attackRight");
+		if (side == -2)
+			actualPiece.piece.GetComponent<Animator>().SetTrigger("attackLeft135");
+		else if (side == 2)
+			actualPiece.piece.GetComponent<Animator>().SetTrigger("attackRight135");
+		yield return new WaitForSeconds(2);
+
+	}
+
 	
 	// Update is called once per frame
 	void Update () 
@@ -93,25 +159,40 @@ public class GameController : MonoBehaviour {
 				int checkX =actualPiece.X-to.X;
 				if( Mathf.Abs(checkX) > 1)
 				{
-					PieceController tempPiece;
-					Debug.Log("bicie!");
+
+
 					attacked = true;
-                    if (DestroyPiece()) // TODO: Destroy Animation
-                    {
-                        Debug.Log("bicie!");
-                        Vector3 temp = new Vector3(to.plane.transform.position.x, to.plane.transform.position.y + pieceHeightMargin, to.plane.transform.position.z);
-                        actualPiece.piece.transform.position = temp; // TODO: movement animation
-                        //MovePiece();
-                    }
-                    
+					toDestroy = DestroyPiece(doneDestroy);
 
-					tempPiece = actualPiece.piece;
-					WaitFor1Sec();
 
-					actualPiece = to;
-					actualPiece.piece = tempPiece;
+					if (toDestroy != null && toDestroy.piece.Allegiance != turnAlligiance && doneDestroy == false)
+						{
+							Debug.Log("bicie!");
+							gameObjectToDestroy = toDestroy.piece.currentGameObject;
+							AttackPiece();
+							//GameObject.Destroy(toDestroy.piece.currentGameObject);
+							//to = toDestroy;
+							doneDestroy= true;
+						}
 
-					WaitFor1Sec();
+					// TUTAJ MA SIE TEN IF WYKONAĆ 
+					// NIE WCHODZI DO NIEGO
+					if (gameObjectToDestroy == null && doneExternalDestroy ==true && doneDestroy == true)
+					{
+						Debug.Log("mowe");
+						Vector3 temp = new Vector3(to.plane.transform.position.x, to.plane.transform.position.y + pieceHeightMargin, to.plane.transform.position.z);
+						actualPiece.piece.transform.position = temp; // TODO: movement animation
+						
+						tempPiece = actualPiece.piece;
+						actualPiece = to;
+						actualPiece.piece = tempPiece;
+						
+						doneDestroy = false;
+						doneExternalDestroy = false;
+						
+					}
+						//MovePiece();
+
 
 					if (actualPiece.piece != null && actualPiece.piece.Allegiance == turnAlligiance)
 					{
@@ -134,7 +215,7 @@ public class GameController : MonoBehaviour {
 									{
 										Debug.Log("nie bedzie forceattack na "+ destination.plane.gameObject.name);
 										forceAttack=false;
-										to= null;
+										//to= null;
 										actualPiece = null;
 									}
 
@@ -142,8 +223,8 @@ public class GameController : MonoBehaviour {
 
 						}else{
 							forceAttack=false;
-							to= null;
-							actualPiece = null;
+							//to= null;
+							//actualPiece = null;
 						}
 					}
 
@@ -183,6 +264,84 @@ public class GameController : MonoBehaviour {
 		}
 
 	}
+
+
+
+
+
+	
+	ChessboardPlane DestroyPiece (bool doneDestroy)
+	{
+		int deltaX =actualPiece.X-to.X;
+		int deltaY =actualPiece.Y-to.Y;
+		ChessboardPlane toDestroy;
+		
+		if(to.X>actualPiece.X && to.Y>actualPiece.Y)
+		{	
+			deltaX = actualPiece.X + 1;
+			deltaY = actualPiece.Y + 1;
+		}
+		
+		if(to.X<actualPiece.X && to.Y>actualPiece.Y)
+		{	
+			deltaX = actualPiece.X - 1;
+			deltaY = actualPiece.Y + 1;
+		}
+		
+		if(to.X>actualPiece.X && to.Y<actualPiece.Y)
+		{	
+			deltaX = actualPiece.X + 1;
+			deltaY = actualPiece.Y - 1;
+		}
+		
+		if(to.X<actualPiece.X && to.Y<actualPiece.Y)
+		{	
+			deltaX = actualPiece.X - 1;
+			deltaY = actualPiece.Y - 1;
+		}
+
+
+		toDestroy = ChessboardControllerScript.Board [deltaX - 1, deltaY - 1];
+
+		//	Debug.Log ("do zabicia x:"+deltaX + "y:"+deltaY);
+		//	Debug.Log (" name:" + toDestroy.piece.currentGameObject.name);
+
+		return toDestroy;
+		
+	}
+
+	void AttackPiece()
+	{
+		if (to.plane.transform.position.z < actualPiece.plane.transform.position.z)
+		{
+				if (this.turnAlligiance == Allegiance.black)
+					if (to.plane.transform.position.x > actualPiece.plane.transform.position.x)
+				{
+					//BlockOtherPlanes();
+					StartCoroutine(AttackAnimation(1));
+				}
+				else
+				{
+					// BlockOtherPlanes();
+					StartCoroutine(AttackAnimation(2));
+				}
+				else
+					if (to.plane.transform.position.x < actualPiece.plane.transform.position.x)
+				{
+					// BlockOtherPlanes();
+					StartCoroutine(AttackAnimation(-1));
+				}
+				else
+				{
+					// BlockOtherPlanes();
+					StartCoroutine(AttackAnimation(-2));
+				}
+
+			}
+
+	}
+
+
 
     void MovePiece()
     {
@@ -292,37 +451,6 @@ public class GameController : MonoBehaviour {
 
 
 
-    IEnumerator TurnAnimation(int side)
-    {
-        
-        if( side == -1)
-        actualPiece.piece.GetComponent<Animator>().SetTrigger("turnLeft45");
-        else if (side == 1)
-        actualPiece.piece.GetComponent<Animator>().SetTrigger("turnRight45");
-        if (side == -2)
-            actualPiece.piece.GetComponent<Animator>().SetTrigger("turnLeft135");
-        else if (side == 2)
-            actualPiece.piece.GetComponent<Animator>().SetTrigger("turnRight135");
-        yield return new WaitForSeconds(1);
-     
-    }
-
-    IEnumerator TurnBackAnimation(int side)
-    {
-        Vector3 temp = new Vector3(to.plane.transform.position.x, to.plane.transform.position.y + pieceHeightMargin, to.plane.transform.position.z);
-        actualPiece.piece.transform.position = temp;
-        if (side == -1)
-            actualPiece.piece.GetComponent<Animator>().SetTrigger("turnStraightFromLeft45");
-        else if (side == 1)
-            actualPiece.piece.GetComponent<Animator>().SetTrigger("turnStraightFromRight45");
-        if (side == -2)
-            actualPiece.piece.GetComponent<Animator>().SetTrigger("turnStraightFromLeft135");
-        else if (side == 2)
-            actualPiece.piece.GetComponent<Animator>().SetTrigger("turnStraightFromRight135");
-        yield return new WaitForSeconds(1);
-
-    }
-
     void BlockOtherPieces()
     {
         foreach (ChessboardPlane colorPiece in ChessboardControllerScript.Board)
@@ -366,48 +494,6 @@ public class GameController : MonoBehaviour {
 						blackCount--;
 	}
 
-	bool DestroyPiece ()
-	{
-		int deltaX =actualPiece.X-to.X;
-		int deltaY =actualPiece.Y-to.Y;
-		ChessboardPlane toDestroy;
-		
-		if(to.X>actualPiece.X && to.Y>actualPiece.Y)
-		{	
-			deltaX = actualPiece.X + 1;
-			deltaY = actualPiece.Y + 1;
-		}
-		
-		if(to.X<actualPiece.X && to.Y>actualPiece.Y)
-		{	
-			deltaX = actualPiece.X - 1;
-			deltaY = actualPiece.Y + 1;
-		}
-		
-		if(to.X>actualPiece.X && to.Y<actualPiece.Y)
-		{	
-			deltaX = actualPiece.X + 1;
-			deltaY = actualPiece.Y - 1;
-		}
-		
-		if(to.X<actualPiece.X && to.Y<actualPiece.Y)
-		{	
-			deltaX = actualPiece.X - 1;
-			deltaY = actualPiece.Y - 1;
-		}
-		
-		toDestroy =ChessboardControllerScript.Board[deltaX-1,deltaY-1];
-
-	//	Debug.Log ("do zabicia x:"+deltaX + "y:"+deltaY);
-	//	Debug.Log (" name:" + toDestroy.piece.currentGameObject.name);
-		if(toDestroy != null && toDestroy.piece.Allegiance != turnAlligiance)
-		{
-			GameObject.Destroy(toDestroy.piece.currentGameObject);
-			return true;
-		}else 
-			return false;
-	
-	}
 
 	void CheckIfWin()
 	{
@@ -437,15 +523,13 @@ public class GameController : MonoBehaviour {
 		{
 			cameraAnimator.SetTrigger("WhiteToBlack");
 			turnAlligiance = Allegiance.black;
-			//gameCamera.transform.rotation = cameraBlackRotation;
-			//gameCamera.transform.position = cameraBlackPosition;
+
 		}
 		else if (turnAlligiance == Allegiance.black)
 		{
 			cameraAnimator.SetTrigger("BlackToWhite");
 			turnAlligiance = Allegiance.white;
-			//gameCamera.transform.rotation = cameraWhiteRotation;
-			//gameCamera.transform.position = cameraWhitePosition;
+		
 		}
 		
 	}
