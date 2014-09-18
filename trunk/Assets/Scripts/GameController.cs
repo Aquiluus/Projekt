@@ -7,6 +7,7 @@ public class GameController : MonoBehaviour {
 
     public ChessboardPlane lastPiece;
 	public GameObject lastPiece1;
+	public TankMovementController tankMovementScript;
     public ChessboardPlane actualPiece;
 	public GameObject actualPiece1;
     public ChessboardPlane to;
@@ -43,7 +44,7 @@ public class GameController : MonoBehaviour {
 
     public Allegiance turnAlligiance = Allegiance.white;
 
-    // TODO : camera animation
+ 
    
     private Quaternion cameraWhiteRotation = Quaternion.Euler(new Vector3(45.0f, -90.0f, 0.0f));
     private Quaternion cameraBlackRotation = Quaternion.Euler(new Vector3(45.0f, 90.0f, 0.0f));
@@ -72,67 +73,109 @@ public class GameController : MonoBehaviour {
 		PreTurnSetting();
        
     }
-	IEnumerator WaitFor1Sec(){
-
-		 yield return new WaitForSeconds(1.0F);
-	}
-
-    IEnumerator WaitFor3Sec()
-    {
-        yield return new WaitForSeconds(3.0f);
-    }
 
 	
-	IEnumerator TurnAnimation(int side)
+	IEnumerator TurnAnimation(int side,PieceController piece)
 	{
+		piece.particleSystem.SetActive (false);
+		turned = true;
+		ClearParticles ();
+		Animator anim = piece.GetComponent<Animator> ();
 		
 		if( side == -1)
-			actualPiece.piece.GetComponent<Animator>().SetTrigger("turnLeft45");
+			anim.SetTrigger("turnLeft45");
 		else if (side == 1)
-			actualPiece.piece.GetComponent<Animator>().SetTrigger("turnRight45");
+			anim.SetTrigger("turnRight45");
 		if (side == -2)
-			actualPiece.piece.GetComponent<Animator>().SetTrigger("turnLeft135");
+			anim.SetTrigger("turnLeft135");
 		else if (side == 2)
-			actualPiece.piece.GetComponent<Animator>().SetTrigger("turnRight135");
+			anim.SetTrigger("turnRight135");
 		yield return new WaitForSeconds(1);
+		StartCoroutine(MoveAnimation(side,piece));
 		
 	}
 
-	IEnumerator IdleAnimation()
+	IEnumerator MoveAnimation(int side,PieceController piece)
 	{
+		tankMovementScript.tank = piece.currentGameObject;
+		tankMovementScript.to = to;
+		tankMovementScript.go();
 
-		actualPiece.piece.GetComponent<Animator>().SetTrigger("turnLeft135");
-		yield return new WaitForSeconds(1);
+
+		yield return new WaitForSeconds(2);
+		StartCoroutine (TurnBackAnimation (side,piece));
+		
 	}
 	
-	IEnumerator TurnBackAnimation(int side)
+
+	IEnumerator TurnBackAnimation(int side,PieceController piece)
 	{
-		Vector3 temp = new Vector3(to.plane.transform.position.x, to.plane.transform.position.y + pieceHeightMargin, to.plane.transform.position.z);
-		actualPiece.piece.transform.position = temp;
+		Animator anim = piece.GetComponent<Animator> ();
+
+	
+		//Vector3 temp = new Vector3(to.plane.transform.position.x, to.plane.transform.position.y + pieceHeightMargin, to.plane.transform.position.z);
+
 		if (side == -1)
-			actualPiece.piece.GetComponent<Animator>().SetTrigger("turnStraightFromLeft45");
+			anim.SetTrigger("turnStraightFromLeft45");
 		else if (side == 1)
-			actualPiece.piece.GetComponent<Animator>().SetTrigger("turnStraightFromRight45");
+			anim.SetTrigger("turnStraightFromRight45");
 		if (side == -2)
-			actualPiece.piece.GetComponent<Animator>().SetTrigger("turnStraightFromLeft135");
+			anim.SetTrigger("turnStraightFromLeft135");
 		else if (side == 2)
-			actualPiece.piece.GetComponent<Animator>().SetTrigger("turnStraightFromRight135");
+			anim.SetTrigger("turnStraightFromRight135");
 		yield return new WaitForSeconds(1);
+
+		MovementDone ();
 		
 	}
 
-	IEnumerator AttackAnimation (int side)
+
+	void MoveAfterAttack()
 	{
+		Debug.Log("mowe");
+		Vector3 temp = new Vector3(to.plane.transform.position.x, to.plane.transform.position.y + pieceHeightMargin, to.plane.transform.position.z);
+
+
+		//actualPiece.piece.currentGameObject.transform.position = temp; // TODO: movement animation
+
+//		tankMovementScript.tank = actualPiece.piece.currentGameObject;
+//		tankMovementScript.to = to;
+//		tankMovementScript.go();
+
+		MovePiece ();
+
+		tempPiece = actualPiece.piece;
+		actualPiece = to;
+		actualPiece.piece = tempPiece;
+		
+		doneDestroy = false;
+		doneExternalDestroy = false;
+
+		//MovementDone ();
+
+	}
+
+
+
+	IEnumerator AttackAnimation (int side, PieceController piece)
+	{
+		piece.particleSystem.SetActive (false);
+		turned = true;
+		ClearParticles ();
+
+		Animator anim = piece.GetComponent<Animator> ();
+
 		if( side == -1)
-			actualPiece.piece.GetComponent<Animator>().SetTrigger("attackLeft");
+			anim.SetTrigger("attackLeft");
 		else if (side == 1)
-			actualPiece.piece.GetComponent<Animator>().SetTrigger("attackRight");
+			anim.SetTrigger("attackRight");
 		if (side == -2)
-			actualPiece.piece.GetComponent<Animator>().SetTrigger("attackLeft135");
+			anim.SetTrigger("attackLeft135");
 		else if (side == 2)
-			actualPiece.piece.GetComponent<Animator>().SetTrigger("attackRight135");
+			anim.SetTrigger("attackRight135");
 		yield return new WaitForSeconds(2);
 
+		MoveAfterAttack ();
 	}
 
 	
@@ -153,7 +196,7 @@ public class GameController : MonoBehaviour {
 			}
 			ActivatePossibleDestinations();
 
-			if (to != null && to.particleSystem.activeInHierarchy == true && actualPiece.piece.Allegiance == turnAlligiance)
+			if (to != null && to.particleSystem.activeInHierarchy == true && actualPiece!=null )//&& actualPiece.piece.Allegiance == turnAlligiance)
 			{
 
 				int checkX =actualPiece.X-to.X;
@@ -162,39 +205,13 @@ public class GameController : MonoBehaviour {
 
 
 					attacked = true;
-					toDestroy = DestroyPiece(doneDestroy);
+					toDestroy = DestroyPiece();
 
 
-					if (toDestroy != null && toDestroy.piece.Allegiance != turnAlligiance && doneDestroy == false)
-						{
-							Debug.Log("bicie!");
-							gameObjectToDestroy = toDestroy.piece.currentGameObject;
-							AttackPiece();
-							//GameObject.Destroy(toDestroy.piece.currentGameObject);
-							//to = toDestroy;
-							doneDestroy= true;
-						}
-
-					// TUTAJ MA SIE TEN IF WYKONAĆ 
-					// NIE WCHODZI DO NIEGO
-					if (gameObjectToDestroy == null && doneExternalDestroy ==true && doneDestroy == true)
-					{
-						Debug.Log("mowe");
-						Vector3 temp = new Vector3(to.plane.transform.position.x, to.plane.transform.position.y + pieceHeightMargin, to.plane.transform.position.z);
-						actualPiece.piece.transform.position = temp; // TODO: movement animation
-						
-						tempPiece = actualPiece.piece;
-						actualPiece = to;
-						actualPiece.piece = tempPiece;
-						
-						doneDestroy = false;
-						doneExternalDestroy = false;
-						
-					}
-						//MovePiece();
 
 
-					if (actualPiece.piece != null && actualPiece.piece.Allegiance == turnAlligiance)
+
+					if (actualPiece.piece != null && actualPiece.piece.Allegiance == turnAlligiance && forceAttack==false)
 					{
 						Debug.Log("po biciu");
 						ClearPossibleDestinations();
@@ -209,14 +226,18 @@ public class GameController : MonoBehaviour {
 										forceAttack = true;
 										Debug.Log ("bedzie force attack zapale lampkę na "+ destination.plane.gameObject.name);
                                         BlockOtherPieces();
+									if(!turned)
 										destination.particleSystem.SetActive(true);
+										ClearPossibleDestinations();
+										break;
 										
 									}else
 									{
 										Debug.Log("nie bedzie forceattack na "+ destination.plane.gameObject.name);
 										forceAttack=false;
+										destination.particleSystem.SetActive(false);
 										//to= null;
-										actualPiece = null;
+										//actualPiece = null;
 									}
 
 							}
@@ -228,22 +249,33 @@ public class GameController : MonoBehaviour {
 						}
 					}
 
+					if (toDestroy != null && toDestroy.piece.Allegiance != turnAlligiance && doneDestroy == false)
+					{
+						//Debug.Log("bicie!");
+						gameObjectToDestroy = toDestroy.piece.currentGameObject;
+						AttackPiece();
+						//GameObject.Destroy(toDestroy.piece.currentGameObject);
+						//to = toDestroy;
+						doneDestroy= true;
+						
+					}
 				
-			}
+				}
+
 				if (actualPiece !=null && to!=null && attacked ==false)
 				{
                     
-					Debug.Log ("ruch bez bicia");
-                    
+					//Debug.Log ("ruch bez bicia");
+					if(actualPiece.piece!=null)
                     currAngle = FindAngle(actualPiece.piece.ownTank.transform.position, to.plane.transform.position, actualPiece.piece.ownTank.transform.up);
                     Debug.Log("Kąt: " + currAngle);
 
                     
                     MovePiece();
 
-                    //actualPiece.piece.transform.position = temp; // TODO: movement animation
+                    //actualPiece.piece.transform.position = temp; 
 					forceAttack = false;
-					to=null;
+
 				}
                
 				if(forceAttack != true && moveDone == true)
@@ -251,9 +283,9 @@ public class GameController : MonoBehaviour {
 					Debug.Log ("koniec tury");
 					attacked = false;
 					MovementDone();
-                    forceAttack = false;
-                    actualPiece = null;
-                    to = null;
+//                    forceAttack = false;
+//                    actualPiece = null;
+//                    to = null;
                     moveDone = false;
 				}
 
@@ -270,7 +302,7 @@ public class GameController : MonoBehaviour {
 
 
 	
-	ChessboardPlane DestroyPiece (bool doneDestroy)
+	ChessboardPlane DestroyPiece ()
 	{
 		int deltaX =actualPiece.X-to.X;
 		int deltaY =actualPiece.Y-to.Y;
@@ -303,8 +335,9 @@ public class GameController : MonoBehaviour {
 
 		toDestroy = ChessboardControllerScript.Board [deltaX - 1, deltaY - 1];
 
-		//	Debug.Log ("do zabicia x:"+deltaX + "y:"+deltaY);
-		//	Debug.Log (" name:" + toDestroy.piece.currentGameObject.name);
+//			Debug.Log ("do zabicia x:"+deltaX + "y:"+deltaY);
+//		if(toDestroy.piece.currentGameObject!=null)
+//			Debug.Log (" name:" + toDestroy.piece.currentGameObject.name);
 
 		return toDestroy;
 		
@@ -312,33 +345,30 @@ public class GameController : MonoBehaviour {
 
 	void AttackPiece()
 	{
-		if (to.plane.transform.position.z < actualPiece.plane.transform.position.z)
+		if (this.turnAlligiance == Allegiance.black) 
 		{
-				if (this.turnAlligiance == Allegiance.black)
-					if (to.plane.transform.position.x > actualPiece.plane.transform.position.x)
-				{
-					//BlockOtherPlanes();
-					StartCoroutine(AttackAnimation(1));
-				}
-				else
-				{
-					// BlockOtherPlanes();
-					StartCoroutine(AttackAnimation(2));
-				}
-				else
-					if (to.plane.transform.position.x < actualPiece.plane.transform.position.x)
-				{
-					// BlockOtherPlanes();
-					StartCoroutine(AttackAnimation(-1));
-				}
-				else
-				{
-					// BlockOtherPlanes();
-					StartCoroutine(AttackAnimation(-2));
-				}
-
+			
+			if (to.X < actualPiece.X && to.Y > actualPiece.Y) {
+				StartCoroutine (AttackAnimation (1,actualPiece.piece));
+			} else if (to.X > actualPiece.X && to.Y > actualPiece.Y){
+				StartCoroutine (AttackAnimation (-1,actualPiece.piece));
+			}else if (to.X < actualPiece.X && to.Y < actualPiece.Y) {
+				StartCoroutine (AttackAnimation (2,actualPiece.piece));
+			} else if (to.X > actualPiece.X && to.Y < actualPiece.Y){
+				StartCoroutine (AttackAnimation (-2,actualPiece.piece));
 			}
-
+		} else if (this.turnAlligiance == Allegiance.white) 
+		{
+			if (to.X > actualPiece.X && to.Y < actualPiece.Y) {
+				StartCoroutine (AttackAnimation (1,actualPiece.piece));
+			} else if (to.X < actualPiece.X && to.Y < actualPiece.Y){
+				StartCoroutine (AttackAnimation (-1,actualPiece.piece));
+			}else if (to.X > actualPiece.X && to.Y > actualPiece.Y) {
+				StartCoroutine (AttackAnimation (2,actualPiece.piece));
+			} else if (to.X < actualPiece.X && to.Y > actualPiece.Y){
+				StartCoroutine (AttackAnimation (-2,actualPiece.piece));
+			}
+		}
 	}
 
 
@@ -354,57 +384,57 @@ public class GameController : MonoBehaviour {
                     if (to.plane.transform.position.x > actualPiece.plane.transform.position.x)
                     {
                         //BlockOtherPlanes();
-                        StartCoroutine(TurnAnimation(1));
+                        StartCoroutine(TurnAnimation(1,actualPiece.piece));
                     }
                     else
                     {
                        // BlockOtherPlanes();
-                        StartCoroutine(TurnAnimation(2));
-                    }
-                else
+					StartCoroutine(TurnAnimation(2,actualPiece.piece));
+				}
+				else
                     if (to.plane.transform.position.x < actualPiece.plane.transform.position.x)
                     {
                        // BlockOtherPlanes();
-                        StartCoroutine(TurnAnimation(-1));
-                    }
-                    else
+					StartCoroutine(TurnAnimation(-1,actualPiece.piece));
+				}
+				else
                     {
                        // BlockOtherPlanes();
-                        StartCoroutine(TurnAnimation(-2));
-                    }
-
-
-                turnDone = true;
+					StartCoroutine(TurnAnimation(-2,actualPiece.piece));
+				}
+				
+				//StartCoroutine(MoveAnimation());
+				turnDone = true;
                 BlockOtherPieces();
             }
-            else
-            {
-                forceAttack = false;
-                if (this.turnAlligiance == Allegiance.black)
-                    if (to.plane.transform.position.x > actualPiece.plane.transform.position.x)
-                    {
-                       // BlockOtherPlanes();
-                        StartCoroutine(TurnBackAnimation(1));
-                    }
-                    else
-                    {
-                       // BlockOtherPlanes();
-                        StartCoroutine(TurnBackAnimation(2));
-                    }
-                else
-                    if (to.plane.transform.position.x < actualPiece.plane.transform.position.x)
-                    {
-                      //  BlockOtherPlanes();
-                        StartCoroutine(TurnBackAnimation(-1));
-                    }
-                    else
-                    {
-                       // BlockOtherPlanes();
-                        StartCoroutine(TurnBackAnimation(-2));
-                    }
-                turnDone = false;
-                MovementDone();
-            }
+//            else
+//            {
+//                forceAttack = false;
+//                if (this.turnAlligiance == Allegiance.black)
+//                    if (to.plane.transform.position.x > actualPiece.plane.transform.position.x)
+//                    {
+//                       // BlockOtherPlanes();
+			//                        StartCoroutine(TurnBackAnimation(1,actualPiece.piece));
+//                    }
+//                    else
+//                    {
+//                       // BlockOtherPlanes();
+			//                        StartCoroutine(TurnBackAnimation(2,actualPiece.piece));
+//                    }
+//                else
+//                    if (to.plane.transform.position.x < actualPiece.plane.transform.position.x)
+//                    {
+//                      //  BlockOtherPlanes();
+			//                        StartCoroutine(TurnBackAnimation(-1,actualPiece.piece));
+//                    }
+//                    else
+//                    {
+//                       // BlockOtherPlanes();
+			//                        StartCoroutine(TurnBackAnimation(-2,actualPiece.piece));
+//                    }
+//                turnDone = false;
+//                MovementDone();
+//            }
 
         }
         else if (to.plane.transform.position.z > actualPiece.plane.transform.position.z)
@@ -414,35 +444,36 @@ public class GameController : MonoBehaviour {
                 ClearPossibleDestinations();
                 if (this.turnAlligiance == Allegiance.black)
                     if (to.plane.transform.position.x > actualPiece.plane.transform.position.x)
-                        StartCoroutine(TurnAnimation(-1));
-                    else
-                        StartCoroutine(TurnAnimation(-2));
+						StartCoroutine(TurnAnimation(-1,actualPiece.piece));
+				else
+					StartCoroutine(TurnAnimation(-2,actualPiece.piece));
                 else
                     if (to.plane.transform.position.x < actualPiece.plane.transform.position.x)
-                        StartCoroutine(TurnAnimation(1));
-                    else
-                        StartCoroutine(TurnAnimation(2));
-
-
+						StartCoroutine(TurnAnimation(1,actualPiece.piece));
+				else
+					StartCoroutine(TurnAnimation(2,actualPiece.piece));
+				
+				//StartCoroutine(MoveAnimation());
                 turnDone = true;
                 BlockOtherPieces();
+
             }
-            else
-            {
-                forceAttack = false;
-                if (this.turnAlligiance == Allegiance.black)
-                    if (to.plane.transform.position.x > actualPiece.plane.transform.position.x)
-                        StartCoroutine(TurnBackAnimation(-1));
-                    else
-                        StartCoroutine(TurnBackAnimation(-2));
-                else
-                    if (to.plane.transform.position.x < actualPiece.plane.transform.position.x)
-                        StartCoroutine(TurnBackAnimation(1));
-                    else
-                        StartCoroutine(TurnBackAnimation(2));
-                turnDone = false;
-                MovementDone();
-            }
+//            else
+//            {
+//                forceAttack = false;
+//                if (this.turnAlligiance == Allegiance.black)
+//                    if (to.plane.transform.position.x > actualPiece.plane.transform.position.x)
+			//                        StartCoroutine(TurnBackAnimation(-1,actualPiece.piece));
+//                    else
+			//                        StartCoroutine(TurnBackAnimation(-2,actualPiece.piece));
+//                else
+//                    if (to.plane.transform.position.x < actualPiece.plane.transform.position.x)
+			//                        StartCoroutine(TurnBackAnimation(1,actualPiece.piece));
+//                    else
+			//                        StartCoroutine(TurnBackAnimation(2,actualPiece.piece));
+//                turnDone = false;
+//                MovementDone();
+//            }
 
         }
 
@@ -510,11 +541,27 @@ public class GameController : MonoBehaviour {
 
 	void MovementDone()
 	{
+			ClearParticles ();
+			turned = false;
+			doneDestroy = false;
+			doneExternalDestroy = false;
+			turnDone = false;
+			forceAttack = false;
             ClearPossibleDestinations();
             to = null;
             actualPiece = null;
             PostTurnSetting();
             PreTurnSetting();
+	}
+
+	void ClearParticles()
+	{
+		foreach(ChessboardPlane cp in ChessboardControllerScript.Board)
+		{
+			cp.particleSystem.SetActive(false);
+
+		}
+
 	}
 
 	void PostTurnSetting()
@@ -560,6 +607,7 @@ public class GameController : MonoBehaviour {
         {
             if (possiblePlane != null && possiblePlane.piece == null)
             {
+				if(!turned)
                 possiblePlane.particleSystem.SetActive(true);
                 possiblePlane.plane.GetComponent<TapGesture>().enabled = true;
 

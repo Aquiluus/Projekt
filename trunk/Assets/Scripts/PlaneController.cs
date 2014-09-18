@@ -5,8 +5,8 @@ using TouchScript.Gestures;
 using TouchScript.Events;
 using System;
 
-
-public class PlaneController : MonoBehaviour {
+[System.Serializable]
+public class PlaneController : MonoBehaviour{
 
 
     private ChessboardController ChessboardControllerScript;
@@ -41,8 +41,8 @@ public class PlaneController : MonoBehaviour {
     {
         if (e.State == Gesture.GestureState.Recognized)
         {
-            int pirsza = this.name[6] - '0'; // kurwa jak ? 
-            int drugo = this.name[7] - '0'; // nie wieże 
+            int pirsza = this.name[6] - '0'; 
+            int drugo = this.name[7] - '0'; 
             GameControllerScript.to = ChessboardControllerScript.Board[pirsza - 1, drugo - 1];
 
 

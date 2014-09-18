@@ -5,6 +5,7 @@ using TouchScript.Gestures;
 using TouchScript.Events;
 using System;
 
+[System.Serializable]
 public class PieceController : MonoBehaviour {
 
         public Allegiance Allegiance;
@@ -83,8 +84,8 @@ public class PieceController : MonoBehaviour {
             if (OcupiedPlane != null)
             {
 				Debug.Log ("klik ocupied plane zajęty");
-	                int pirsza = OcupiedPlane.name[6] - '0'; // kurwa jak ? 
-	                int drugo = OcupiedPlane.name[7] - '0'; // nie wieże 
+	                int pirsza = OcupiedPlane.name[6] - '0';  
+	                int drugo = OcupiedPlane.name[7] - '0'; 
 	                GameControllerScript.lastPiece = GameControllerScript.actualPiece;
 	                if (GameControllerScript.lastPiece != null && GameControllerScript.lastPiece.piece != null)
 	                {
@@ -99,7 +100,9 @@ public class PieceController : MonoBehaviour {
 	                    GameControllerScript.lastPiece.piece.particleSystem.SetActive(false);
 	                }
 	                GameControllerScript.actualPiece = ChessboardControllerScript.Board[pirsza - 1, drugo - 1];
-	                GameControllerScript.actualPiece.piece.particleSystem.SetActive(true);
+				if(GameControllerScript.actualPiece.piece!=null)
+				   GameControllerScript.actualPiece.piece.particleSystem.SetActive(true);
+
             }
 
 
@@ -152,7 +155,7 @@ public class PieceController : MonoBehaviour {
 		{
 				int pirsza = other.name [6] - '0'; // kurwa jak ? 
 				int drugo = other.name [7] - '0'; // nie wieże 
-				ChessboardControllerScript.Board [pirsza - 1, drugo - 1].piece.particleSystem.SetActive (false);
+				//ChessboardControllerScript.Board [pirsza - 1, drugo - 1].piece.particleSystem.SetActive (false);
 				ChessboardControllerScript.Board [pirsza - 1, drugo - 1].piece = null;
 		}
     }

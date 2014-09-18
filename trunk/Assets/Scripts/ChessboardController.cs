@@ -3,7 +3,9 @@ using System.Collections;
 
 public enum Allegiance { none, white, black };
 
+[System.Serializable]
 public class ChessboardController : MonoBehaviour {
+
 
     public ChessboardPlane[,] Board;
 
@@ -56,6 +58,7 @@ public class ChessboardController : MonoBehaviour {
     }
 }
 
+[System.Serializable]
 public class ChessboardPlane
 {
     public int X;
